@@ -1,5 +1,7 @@
+const path = require('path');
 const fs = require('fs');
-const readableStream = fs.createReadStream('text.txt', 'utf-8');
 const { stdout } = process;
-readableStream.on('data', chunk => stdout.write(chunk));
-readableStream.on('error', error => console.log('Error', error.message));
+const readStream = fs.createReadStream(path.join(__dirname, 'text.txt'), 'utf-8');
+readStream.on('data', chunk => stdout.write(chunk));
+
+// readStream.on('data', data => stdout.write(data));
