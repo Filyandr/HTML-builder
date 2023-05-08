@@ -6,11 +6,11 @@ const { stdout } = process;
 const secretPath = path.resolve(__dirname, 'secret-folder');
 
 async function readDirectory() {
-    try {
-        const files = await fsPromises.readdir(secretPath, { withFileTypes: true });
-        for (const file of files) {
-            if (file.isFile()) {
-            const filePath = path.resolve(secretPath, file.name);
+  try {
+    const files = await fsPromises.readdir(secretPath, { withFileTypes: true });
+    for (const file of files) {
+      if (file.isFile()) {
+        const filePath = path.resolve(secretPath, file.name);
 
         fs.stat(filePath, (err, stats) => {
           if (err) throw err;
@@ -23,8 +23,8 @@ async function readDirectory() {
         });
       }
     }
-} catch (error) {
+  } catch (error) {
     console.log(`Can't read directory: ${error}`);
-}
+  }
 }
 readDirectory()
