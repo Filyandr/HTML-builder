@@ -9,7 +9,9 @@ const pathCopyFolder = path.resolve(__dirname, 'files-copy');
 async function copyDirectory() {
   try {
     await fsPromises.rm(pathCopyFolder, { recursive: true, force: true });
-    await fsPromises.mkdir(pathCopyFolder, { recursive: true });
+    await fsPromises.mkdir(pathCopyFolder, { recursive: true }, () => {
+      if (err) throw err;
+    });
 
     const files = await fsPromises.readdir(pathFolder, { withFileTypes: true });
     for (const file of files) {
