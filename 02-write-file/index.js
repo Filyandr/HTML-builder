@@ -3,6 +3,10 @@ const fs = require('fs');
 const { stdin, stdout } = process;
 
 const filePath = path.resolve(__dirname, 'text.txt');
+fs.open((filePath), 'w', (err) => {
+    if(err) throw err;
+    console.log('file sozdan');
+})
 
 stdout.write('Bonjour! \nВведите текст, он добавится в "text.txt"\n');
 
