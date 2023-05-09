@@ -48,44 +48,31 @@ for (const file of files) {
 }
 
 // HTML
-// TO DO обернуть в async function
-const templateReadStream = fs.createReadStream((pathToTemplate), 'utf-8');
-let template = '';
+async function createHtml() {
+  try {
+    const template = await fsPromises.readFile(pathToTemplate, 'utf-8');
+    const templateTags = template.match(/{{(\w+)}}/g);
+    let result = template;
 
-templateReadStream.on('data', chunk => template += chunk);
-templateReadStream.on('end', () => {
-  let components = template.matchAll(/{{(\w+)}}/g);
-
-  for (const component of components) {
-    let componentName = path.normalize(path.join(component[0].slice(2, -2) + '.html'));
-
-    fsPromises.readdir(path.normalize(pathToComponents), { withFileTypes: true }).then(files => {
-      files.forEach(file => {
-        let fileName = file.name;
-        if (file.isFile() && fileName === componentName) {
-          let filePath = path.normalize(path.join(path.normalize(pathToComponents), fileName));
-          let fileContent = '';
-
-          let htmlReadStream = fs.createReadStream(filePath, 'utf-8');
-          htmlReadStream.on('data', chunk => {
-            fileContent += chunk;
-          });
-          htmlReadStream.on('end', () => {
-            template = template.replace(component[0], fileContent);
-
-            const writeHtmlStream = fs.createWriteStream(path.normalize(path.join(path.normalize(path.join(__dirname, 'project-dist')), 'index.html')));
-            writeHtmlStream.write(template);
-          });
-        }
-      });
-    });
+    for (const tag of templateTags) {
+      const tagName = tag.slice(2, -2);
+      const componentFileName = path.resolve(pathToComponents, `${tagName}.html`);
+      try {
+        const component = await fsPromises.readFile(componentFileName, 'utf-8');
+        result = result.replace(tag, component);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    await fsPromises.writeFile(path.resolve(pathToDist, 'index.html'), result);
+  } catch (err) {
+    console.error(err);
   }
-});
-// }
+}
 
 async function buildPage() {
   await copyAssetsFolder();
   await mergeStyles();
+  await createHtml();
 }
 buildPage();
-
